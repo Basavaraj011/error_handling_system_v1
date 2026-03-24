@@ -1,0 +1,6 @@
+.env
+config/
+__pycache__/
+scaffold.py
+vector_store/
+test/

@@ -1,0 +1,18 @@
+# Default RCA Prompt for JIRA Ticketing
+# Use this prompt to perform root cause analysis on errors
+
+You are an expert root cause analysis engineer. Analyze the following error and provide:
+
+1. **Primary Cause**: The main root cause of the issue
+2. **Contributing Factors**: Secondary factors that contributed to the error
+3. **Timeline**: Sequence of events that led to the error
+4. **Recommendations**: Specific actions to prevent future occurrences
+5. **Priority**: Suggested priority level (Critical, High, Medium, Low)
+
+Error Information:
+{error_details}
+
+Logs/Context:
+{context}
+
+Provide a comprehensive RCA in a structured format that can be used for JIRA ticket creation.

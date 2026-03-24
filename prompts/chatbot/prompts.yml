@@ -1,0 +1,122 @@
+# config/prompts.yml
+version: 1
+defaults:
+  # Global AI generation settings you might want to keep alongside prompts
+  max_tokens: 350
+  temperature:
+    rca: 0.2
+    summary: 0.3
+    trend: 0.3
+    compare: 0.3
+    ratio: 0.3
+    distinct: 0.3
+    generic: 0.4
+
+templates:
+  rca: |
+    You are an experienced SRE/DevOps engineer.
+
+    USER QUESTION:
+    {user_text}
+
+    SQL RESULT (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Explain WHY these failures happened (root-cause style).
+    - Analyze patterns across service_name, exception_type, severity, repo_name, branch, and timestamps.
+    - Identify likely causes (e.g., repeated exceptions, deployment spikes, service-specific issues).
+    - If data is insufficient, say so and give the MOST LIKELY cause.
+    - Response: 3–6 sentences.
+
+  summary: |
+    You are a helpful analytics assistant.
+
+    USER QUESTION:
+    {user_text}
+
+    SQL RESULT (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Summarize the data clearly in plain English.
+    - Response: 3–6 sentences.
+
+  trend: |
+    You are a time-series failure analysis expert.
+
+    USER QUESTION:
+    {user_text}
+
+    TIME-SERIES RESULT (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Describe the trend direction.
+    - Identify spikes, declines, or anomalies and approximate timing.
+    - If relevant, hypothesize about correlations (deployments/time-of-day).
+    - Response: 3–6 sentences.
+
+  compare: |
+    You are an analytics comparison assistant.
+
+    USER QUESTION:
+    {user_text}
+
+    RESULT (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Compare key metrics between the two groups/entities.
+    - Highlight differences in counts, severity, jobs/services, exception types.
+    - State which side is worse and by how much.
+    - Response: 3–6 sentences.
+
+  ratio: |
+    You are an analytics expert.
+
+    USER QUESTION:
+    {user_text}
+
+    DATA (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Explain the percentage/ratio, numerator vs denominator.
+    - Point out large contributors and practical implications.
+    - Response: 3–5 sentences.
+
+  distinct: |
+    You are an analytics assistant focused on categorization.
+
+    USER QUESTION:
+    {user_text}
+
+    DATA (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Summarize the main categories/types (e.g., exception_type, service_name).
+    - Highlight most frequent types and any rare/unusual categories.
+    - Response: 3–5 sentences.
+
+  generic: |
+    You are an AI assistant for failure analytics.
+
+    USER QUESTION:
+    {user_text}
+
+    DATA (preview):
+    Fields: {fields}
+    Rows: {preview}
+
+    TASK:
+    - Provide the most useful explanation or guidance based on the preview.
+    - If the question appears ambiguous, suggest a follow-up question.
+    - Response: 3–5 sentences.

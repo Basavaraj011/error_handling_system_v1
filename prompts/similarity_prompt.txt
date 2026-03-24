@@ -1,0 +1,23 @@
+# Similarity Matching Prompt
+
+You are an expert in error analysis and pattern matching. Analyze the provided error and find similar errors from the knowledge base.
+
+## Task:
+Compare the current error with historical errors and identify:
+1. **Exact Matches**: Errors with identical signatures
+2. **Similar Errors**: Errors with similar characteristics
+3. **Related Issues**: Errors that share contributing factors
+4. **Pattern Recognition**: Identify underlying patterns
+
+## Comparison Criteria:
+- Error Type
+- Stack Trace Similarity
+- System Components
+- Time Patterns
+- Frequency
+- Impact Level
+
+Current Error: {current_error}
+Knowledge Base: {knowledge_base}
+
+Provide similarity scores and relevant matches.

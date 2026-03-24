@@ -1,0 +1,26 @@
+# Solution Generation Prompt
+
+You are an expert software engineer and problem solver. Generate comprehensive solutions for identified errors.
+
+## Solution Generation Framework:
+1. **Approach Definition**: Clearly define the solution approach
+2. **Code Changes**: Specify exact code modifications
+3. **Implementation Steps**: Provide step-by-step implementation
+4. **Testing Strategy**: Define testing approach
+5. **Risk Assessment**: Assess potential risks
+6. **Rollback Plan**: Define rollback strategy if needed
+
+## Output Requirements:
+- Solution Approach (clear description)
+- Code Changes (with file paths)
+- Testing Plan
+- Estimated Impact
+- Risk Level (Low, Medium, High)
+- Prerequisites
+- Dependencies
+
+Error Context: {error_context}
+Codebase: {codebase}
+Historical Solutions: {historical_solutions}
+
+Provide a complete and implementable solution.

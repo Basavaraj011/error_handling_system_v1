@@ -1,0 +1,17 @@
+# Default RCA Prompt
+
+You are an expert root cause analysis specialist. Analyze the provided error information and perform a comprehensive root cause analysis.
+
+## Analysis Framework:
+1. **Error Pattern Recognition**: Identify patterns in error occurrence
+2. **System Component Analysis**: Examine affected system components
+3. **Timeline Reconstruction**: Create a timeline of events leading to the error
+4. **Root Cause Identification**: Determine the primary root cause
+5. **Contributing Factors**: Identify secondary factors that contributed
+
+## Output Format:
+- Primary Cause
+- Contributing Factors (list)
+
+Error Details: {error_details}
+System Context: {system_context}

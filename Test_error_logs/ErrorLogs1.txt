@@ -1,0 +1,24 @@
+
+=== PUB Workflow Execution Summary (Last 24h) ===
+Start Time: 2025-11-18T14:13:10Z
+End Time:   2025-11-19T14:13:10Z
+
+Running pub workflows:   6
+Successful pub workflows: 228
+
+=== Failed Workflow Details ===
+
+🔴 Workflow ID: ddd736fe-d854-4bfb-9c2e-73600595b3c6
+   Run ID: 21EeTGCNVgeRChpVpQp1e/ksOMldPwuRoJIBXCX4kT4lE=
+   Failure Reason: Unexpected state returned by advertiser request to upload file segment s3://buket/ddd736fe-d854-4bfb-9c2e-73600595b3c6/
+   Integration-87560660-d574-4be9-94b2-1f68f63f6b9c/M102imtps00000N5
+
+🔴 Workflow ID: 9aca7bca-e82c-4731-a435-9e539fdbfe73
+   Run ID: 21mUlyYRot2eB2xo6HOKEEOBFT5auwsKUcn5fwUrO6L70=
+   Failure Reason: 
+com.merkleinc.dat.shared.exception.RetriableActivityException: Unable to upload file from 's3://bubket
+/9aca7bca-e82c-4731-a435-9e539fdbfe73/Integration-9aca7bca-e82c-4731-a435-9e539fdbfe73/M102d2qcb00000_11192025040625.txt' 
+
+Failed pub workflows (true errors): 2
+
+=== End of PUB Report ===

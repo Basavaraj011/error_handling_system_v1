@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.git
+test/
+Test_error_logs/
+vector_store/
