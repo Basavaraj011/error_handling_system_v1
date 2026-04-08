@@ -162,7 +162,7 @@ def extract_log_data_from_content(content: str) -> Dict[str, List[Dict[str, Any]
         "label_type": label_type
     }
 
-    result["errors"] = temp_error_dicts
+    result["errors"] = temp_error_dicts 
     return result
 
 # -------------------------------

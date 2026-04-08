@@ -129,7 +129,7 @@ class ExtractedError:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary format with stack traces as newline-separated strings"""
         return {
-            "tool": self.tool,
+            "tool": self.tool, 
             "main_error": self.main_error,
             "stack_trace": "\n".join(self.stack_trace) if self.stack_trace else "",
             "cleaned_stack_trace": "\n".join(self.cleaned_stack_trace) if self.cleaned_stack_trace else ""
