@@ -96,11 +96,15 @@ def extract_log_data_from_content(content: str) -> Dict[str, List[Dict[str, Any]
             continue
         if not in_error_section:
             continue
-        # Stop condition
-        if "Failed ing workflows" in line or "Failed pub workflows" in line:
-            if current_block:
-                workflow_blocks.append(current_block)
-            break
+
+        if "Failed ing workflows" in line and "true errors" in line:
+            total_failure_count = int(re.findall(r"\d+", line)[0])
+            continue
+
+        if "Failed pub workflows" in line and "true errors" in line:
+            total_failure_count = int(re.findall(r"\d+", line)[0])
+            continue
+
         # Start new workflow block
         if "Workflow ID:" in line:
             if current_block:
@@ -148,6 +152,15 @@ def extract_log_data_from_content(content: str) -> Dict[str, List[Dict[str, Any]
             "tool": "Unknown",
             "main_error": "Failure Occurred in the Workflow"
         })
+    
+    result["file_summary"] = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "running_workflows": running_count,
+        "successful_workflows": success_count,
+        "failure_workflows": total_failure_count,
+        "label_type": label_type
+    }
 
     result["errors"] = temp_error_dicts
     return result
@@ -155,7 +168,7 @@ def extract_log_data_from_content(content: str) -> Dict[str, List[Dict[str, Any]
 # -------------------------------
 # S3 Processing Function
 # -------------------------------
-def process_s3_file(content: str):
+def process_error_file(content: str):
     """
     Download file from S3 and process it
     """
@@ -189,7 +202,8 @@ def process_s3_file(content: str):
                 print(f"Inserted {len(errors_list)} errors into the database successfully.")
 
                 # Insert job status / non-error logs
-                insert_job_status_data(errors_list, db_manager)
+                file_summary = data.get("file_summary")
+                insert_job_status_data(db_manager, file_summary=file_summary)
                 print(f"Inserted job status data into the database successfully.")
 
             except Exception as e:
@@ -217,4 +231,4 @@ if __name__ == "__main__":
     data = extract_log_data_from_content(content)
     errors_list = data.get("errors", [])
     print("Extracted Errors (Local Test):", errors_list)
-    process_s3_file("bucket","key")
+    process_error_file("bucket","key")

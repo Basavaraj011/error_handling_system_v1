@@ -414,58 +414,42 @@ def update_solution_status(solution, error_id,status, db_manager) -> None:
             db_manager.execute(query)
             logger.info(f"Updated ERROR_LOGS with decreased confidence_score for error_id {error_id}")
 
-def insert_job_status_data(job_status_data: List[Dict[str, Any]], db_manager) -> bool:
+def insert_job_status_data(db_manager, file_summary=None):
     """
-    Insert workflow status data into the JOB_STATUS table.
-    
-    Args:
-        job_status_data: List of job status records. Each dict should have:
-            - start_time
-            - end_time
-            - success_tag
-            - failure_tag
-            - running_tag
-            - success_count
-            - failure_count
-            - running_count
-        db_manager: DatabaseManager instance to execute queries
-    
-    Returns:
-        True if insertion is successful, False otherwise
+    Insert ONE row into JOB_STATUS per file.
     """
     try:
-        for record in job_status_data:
-            query = f"""INSERT INTO {DATABASE_NAME}.{DATABASE_SCHEMA}.JOB_STATUS
-                (start_time, end_time,job_type, success_tag, failure_tag, running_tag, success_count, failure_count, running_count)
-                VALUES
-                (@start_time, @end_time, @label_type, @success_tag, @failure_tag, @running_tag, @success_count, @failure_count, @running_count);"""
+        # Always create ONE record per file
+        record = {
+            "start_time": file_summary["start_time"],
+            "end_time": file_summary["end_time"],
+            "job_type": file_summary.get("label_type", "UNKNOWN"),
+            "success_tag": "SUCCESS",
+            "failure_tag": "FAILURE",
+            "running_tag": "RUNNING",
+            "success_count": file_summary.get("successful_workflows", 0),
+            "failure_count": file_summary.get("failure_workflows", 0),
+            "running_count": file_summary.get("running_workflows", 0),
+        }
 
-            params = {
-                'start_time': record.get('start_time'),
-                'end_time': record.get('end_time'),
-                'job_type': record.get('label_type', 'UNKNOWN'),
-                'success_tag': record.get('success_tag', 'SUCCESS'),
-                'failure_tag': record.get('failure_tag', 'FAILURE'),
-                'running_tag': record.get('running_tag', 'RUNNING'),
-                'success_count': record.get('successful_workflows', 0),
-                'failure_count': record.get('failure_workflows', 0),  # default 0 if not provided
-                'running_count': record.get('running_workflows', 0)
-            }
+        query = f"""
+        INSERT INTO {DATABASE_NAME}.{DATABASE_SCHEMA}.JOB_STATUS
+        (start_time, end_time, job_type,
+         success_tag, failure_tag, running_tag,
+         success_count, failure_count, running_count)
+        VALUES
+        (@start_time, @end_time, @job_type,
+         @success_tag, @failure_tag, @running_tag,
+         @success_count, @failure_count, @running_count);
+        """
 
-            ordered_params = [
-                'start_time', 'end_time', 'job_type',
-                'success_tag', 'failure_tag', 'running_tag',
-                'success_count', 'failure_count', 'running_count'
-            ]
-
-            db_manager.execute(query, params, ordered_params)
-            print(f"Inserted job status data into database")
-
-            break
+        db_manager.execute(query, record, list(record.keys()))
+        print("Inserted ONE job status row for file.")
 
         return True
+
     except Exception as e:
-        logger.error(f"Failed to insert job status data into database: {e}", exc_info=True)
+        logger.error(f"Failed to insert job status data: {e}", exc_info=True)
         return False
     
 def insert_errors_into_db_new(errors: list[dict], db_manager, team_name: str, project_name: str, repo_name: str) -> bool:
@@ -477,8 +461,8 @@ def insert_errors_into_db_new(errors: list[dict], db_manager, team_name: str, pr
         for error in errors:
             query = f"""
                 INSERT INTO {DATABASE_NAME}.{DATABASE_SCHEMA}.ERROR_LOGS
-                (error_tool, project_id, repo_name, error_message, stack_trace, cleaned_stack_trace, severity_level, processed,start_timestamp, end_timestamp)
-                VALUES ( @error_tool, @project_name, @repo_name, @error_message, @stack_trace, @cleaned_stack_trace, 'HIGH', 0, @start_timestamp, @end_timestamp)
+                (error_tool, project_id, repo_name, job_type, error_message, stack_trace, cleaned_stack_trace, severity_level, processed,start_timestamp, end_timestamp)
+                VALUES ( @error_tool, @project_name, @repo_name, @job_type, @error_message, @stack_trace, @cleaned_stack_trace, 'HIGH', 0, @start_timestamp, @end_timestamp)
             """
             params = {
                 'error_tool': error['tool'],
@@ -488,7 +472,8 @@ def insert_errors_into_db_new(errors: list[dict], db_manager, team_name: str, pr
                 'stack_trace': error['stack_trace'],
                 'cleaned_stack_trace': error['cleaned_stack_trace'],
                 'start_timestamp': error.get('start_time'),
-                'end_timestamp': error.get('end_time')
+                'end_timestamp': error.get('end_time'),
+                'job_type': error.get('label_type')
 
             }
 

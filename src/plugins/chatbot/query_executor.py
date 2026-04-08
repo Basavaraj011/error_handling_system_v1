@@ -327,14 +327,38 @@ class QueryExecutor:
         2) Existing LIST and COUNT flows for error_logs (kept as-is below).
         """
         text_l = (text or "").lower()
-
+        job_type = self._extract_job_type(text_l)
         # Gate: treat job tokens as status too (so we prefer job_status when present)
         has_status = self._contains_any(text_l, self.STATUS_TOKENS) or self._contains_any(text_l, self.JOB_TOKENS)
         if not has_status:
             return None
 
+        # --- EARLY OVERRIDE: User wants ERROR DETAILS, not job_status ---
+
+        DETAIL_TOKENS = ["explain", "why", "reason", "root cause", "details", "what happened"]
+
+        wants_error_details = (
+            self._contains_any(text_l, DETAIL_TOKENS)
+            and self._contains_any(text_l, self.STATUS_TOKENS)
+            and job_type is not None
+        )
+
+        if wants_error_details:
+            # Route to ERROR_LOGS LIST for the correct period
+            if period_id == "fixed_today":
+                return {"id": "Q_ERRORS_TODAY_LIST", "query_id": "Q_ERRORS_TODAY_LIST"}
+
+            if period_id == "fixed_last_24h":
+                return {"id": "Q_ERRORS_LAST_24H_LIST", "query_id": "Q_ERRORS_LAST_24H_LIST"}
+
+            if period_id == "fixed_yesterday":
+                return {"id": "Q_ERRORS_YESTERDAY_LIST", "query_id": "Q_ERRORS_YESTERDAY_LIST"}
+
+            # Default fallback → list all recent errors for that job's project
+            return {"id": "Q_LIST_ALL_ERRORS", "query_id": "Q_LIST_ALL_ERRORS"}
+
         # ---------- JOB-STATUS PRIORITY BLOCK ----------
-        job_type = self._extract_job_type(text_l)         # 'ingestion' | 'publishing' | None
+
         wants_health = ("health" in text_l) or ("product health" in text_l)
         wants_status = ("status" in text_l) or ("how many" in text_l) or self._contains_any(text_l, self.JOB_TOKENS)
 

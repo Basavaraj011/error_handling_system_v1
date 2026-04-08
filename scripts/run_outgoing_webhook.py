@@ -9,7 +9,7 @@ import logging
 import re
 from collections import defaultdict, deque
 import html as html_lib
-
+from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify, abort
 from dotenv import load_dotenv
 
@@ -92,8 +92,20 @@ def extract_text_from_payload(payload: dict) -> str:
         return ""
 
     txt = payload.get("text")
+
     if isinstance(txt, str) and txt.strip():
-        return txt.strip()
+        # Clean HTML inside "text"
+        html = html_lib.unescape(txt)
+        soup = BeautifulSoup(html, "html.parser")
+
+        for mention in soup.find_all("at"):
+            mention.decompose()
+
+        text_only = soup.get_text(" ", strip=True)
+        text_only = " ".join(text_only.split())
+
+        print("CLEANED TEXT:", text_only, flush=True)
+        return text_only
 
     sm = payload.get("summary")
     if isinstance(sm, str) and sm.strip():
@@ -112,15 +124,22 @@ def extract_text_from_payload(payload: dict) -> str:
         content = att.get("content")
         if (ctype and "text/html" in ctype.lower()) and isinstance(content, str) and content.strip():
             html = html_lib.unescape(content)
-            html = re.sub(
-                r'<span[^>]*itemtype="http://schema\.skype\.com/Mention"[^>]*>.*?</span>',
-                ' ',
-                html,
-                flags=re.IGNORECASE | re.DOTALL
-            )
-            html = re.sub(r"(?i)<br\s*/?>", "\n", html)
-            text_only = re.sub(r"<[^>]+>", " ", html)
-            text_only = re.sub(r"\s+", " ", text_only).strip()
+
+            # Use BeautifulSoup to strip ALL HTML cleanly
+            soup = BeautifulSoup(html, "html.parser")
+
+            # Remove <at> mention tags cleanly
+            for mention in soup.find_all("at"):
+                mention.decompose()
+
+            # Extract plain text
+            text_only = soup.get_text(" ", strip=True)
+
+            # Normalize excessive whitespace
+            text_only = " ".join(text_only.split())
+
+            print("CLEANED TEXT:", text_only, flush=True)
+
             return text_only
 
     return ""
@@ -195,7 +214,7 @@ def to_teams_response(result: dict) -> dict:
     
     return {
         "type": "message",
-        "text": ChatBot.GUIDANCE_MESSAGE
+        "text": bot.query_executor.GUIDANCE_MESSAGE
     }
 
 

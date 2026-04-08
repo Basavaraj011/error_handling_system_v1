@@ -92,16 +92,16 @@ CREATE TABLE pr_metadata (
 );
 
 CREATE TABLE [AI_PREDICTIVERECOVERYDB].[Project_1].[JOB_STATUS](
-    [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    [start_time] DATETIME2(3) NOT NULL,
-    [end_time] DATETIME2(3) NOT NULL,
-    [job_type] VARCHAR(255) NOT NULL,
-    [success_tag] VARCHAR(255) NOT NULL,
-    [failure_tag] VARCHAR(255) NOT NULL,
-    [running_tag] VARCHAR(255) NOT NULL,
-    [success_count] INT NOT NULL,
-    [failure_count] INT NOT NULL,
-    [running_count] INT NOT NULL
+	[id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[start_time] DATETIME2(3) NOT NULL,
+	[end_time] DATETIME2(3) NOT NULL,
+	[job_type] VARCHAR(255) NOT NULL,
+	[success_tag] VARCHAR(255) NOT NULL,
+	[failure_tag] VARCHAR(255) NOT NULL,
+	[running_tag] VARCHAR(255) NOT NULL,
+	[success_count] INT NOT NULL,
+	[failure_count] INT NOT NULL,
+	[running_count] INT NOT NULL
 );
  
  
